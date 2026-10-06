@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Hi Tech Auto Parts 3 | RMA Return Form</title>
+  <style>
+    :root{
+      --ink:#111827; --muted:#667085; --line:#d7dde5; --panel:#fff;
+      --bg:#f3f5f8; --navy:#0b1220; --blue:#1769e0; --blue2:#0f57bd;
+      --green:#14804a; --red:#c43232; --soft:#eef4ff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+    button,input,select,textarea{font:inherit}
+    .topbar{background:var(--navy);color:#fff;padding:18px 20px;box-shadow:0 2px 10px rgba(0,0,0,.13)}
+    .topbar-inner{max-width:1040px;margin:auto;display:flex;align-items:center;gap:14px}
+    .mark{width:42px;height:42px;border-radius:10px;background:#fff;color:var(--navy);font-weight:900;display:grid;place-items:center;letter-spacing:-1px}
+    .brand{font-weight:800;font-size:18px;line-height:1.1}
+    .brand small{display:block;font-size:12px;font-weight:500;color:#b9c3d4;margin-top:4px}
+    main{max-width:1040px;margin:28px auto 60px;padding:0 18px}
+    .hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:18px}
+    h1{font-size:30px;margin:0 0 6px;letter-spacing:-.7px}
+    .hero p{margin:0;color:var(--muted);max-width:680px}
+    .pill{background:#e8f2ff;color:#1459a8;font-size:12px;font-weight:800;border-radius:999px;padding:7px 10px;white-space:nowrap}
+    .card{background:var(--panel);border:1px solid #e1e6ec;border-radius:16px;box-shadow:0 7px 24px rgba(16,24,40,.06);overflow:hidden}
+    .section{padding:22px;border-bottom:1px solid #e8ebef}
+    .section:last-child{border-bottom:0}
+    .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+    .section-title h2{font-size:17px;margin:0}
+    .section-title span{font-size:12px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+    .grid .full{grid-column:1/-1}
+    label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+    .req{color:var(--red)}
+    input,select,textarea{width:100%;border:1px solid #cfd6df;border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);outline:none;transition:.15s}
+    input:focus,select:focus,textarea:focus{border-color:#6aa7f7;box-shadow:0 0 0 3px rgba(23,105,224,.11)}
+    textarea{min-height:86px;resize:vertical}
+    .hint{font-size:11px;color:var(--muted);margin-top:6px}
+    .card-tools{display:none;margin-top:11px;padding:12px;border:1px solid #d8e5f8;border-radius:10px;background:#f7faff}
+    .card-tools.show{display:block}
+    .secure-link{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-weight:800;color:#fff;background:var(--blue);border-radius:9px;padding:10px 12px;margin-top:10px}
+    .secure-link:hover{background:var(--blue2)}
+    .part-row{display:grid;grid-template-columns:1.6fr .55fr .8fr 42px;gap:10px;align-items:end;margin-bottom:10px}
+    .remove{height:43px;width:42px;border:1px solid #e1bcbc;background:#fff5f5;color:#a52626;border-radius:9px;font-size:20px;cursor:pointer}
+    .add-part{border:1px dashed #94a4b8;background:#f9fbfd;color:#334155;border-radius:9px;padding:9px 12px;font-weight:700;cursor:pointer}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .primary,.secondary{border:0;border-radius:10px;padding:12px 18px;font-weight:800;cursor:pointer}
+    .primary{background:var(--blue);color:#fff}.primary:hover{background:var(--blue2)}
+    .secondary{background:#eef1f5;color:#1f2937}
+    .terms{font-size:12px;color:var(--muted);line-height:1.55;margin:0}
+    .message{display:none;margin-bottom:16px;border-radius:10px;padding:12px 14px;font-size:13px;font-weight:700}
+    .message.error{display:block;background:#fff1f1;color:#9d2626;border:1px solid #f0c6c6}
+    .message.ok{display:block;background:#ecf8f1;color:#15643c;border:1px solid #c5e8d2}
+    .track{margin-top:20px;background:#fff;border:1px solid #e1e6ec;border-radius:16px;padding:20px}
+    .track h3{margin:0 0 5px;font-size:17px}.track p{margin:0 0 14px;color:var(--muted);font-size:13px}
+    .track-line{display:flex;gap:9px}.track-line input{flex:1}.track-line button{white-space:nowrap}
+    .track-result{margin-top:12px;font-size:13px}
+    #printSheet{display:none}
+    .print-page{background:#fff;color:#111;padding:30px;font-family:Arial,sans-serif}
+    .print-head{display:flex;justify-content:space-between;gap:20px;border-bottom:3px solid #111;padding-bottom:13px}
+    .print-brand{font-size:22px;font-weight:900}.rma-box{text-align:right}.rma-box strong{font-size:20px}
+    .print-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin:18px 0;font-size:13px}
+    .print-table{width:100%;border-collapse:collapse;margin:15px 0}.print-table th,.print-table td{border:1px solid #777;padding:8px;text-align:left;font-size:12px}.print-table th{background:#eee}
+    .print-notes{border:1px solid #888;min-height:70px;padding:9px;font-size:12px;white-space:pre-wrap}
+    .print-footer{margin-top:25px;padding-top:10px;border-top:1px solid #aaa;font-size:10px;color:#555}
+    @media(max-width:720px){.hero{display:block}.pill{display:inline-block;margin-top:12px}.grid{grid-template-columns:1fr}.part-row{grid-template-columns:1fr 80px 1fr 42px}.part-row .part-number{grid-column:1/-1}.section{padding:18px}.track-line{flex-direction:column}}
+    @media print{
+      body{background:#fff}
+      .topbar,main{display:none!important}
+      #printSheet{display:block!important}
+      .print-page{padding:0}
+      @page{margin:.45in}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="mark">HT</div>
+      <div class="brand">Hi Tech Auto Parts 3<small>Online Return Authorization</small></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <h1>Request a Return Authorization</h1>
+        <p>Complete the form below to create a printable RMA. Keep the RMA number with the returned merchandise so the return can be identified and tracked.</p>
+      </div>
+      <div class="pill">CUSTOMER RMA FORM</div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <form id="rmaForm" class="card" novalidate>
+      <section class="section">
+        <div class="section-title"><h2>Customer & Purchase Information</h2><span><span class="req">*</span> Required</span></div>
+        <div class="grid">
+          <div>
+            <label for="company">Company Name <span class="req">*</span></label>
+            <input id="company" name="company" autocomplete="organization" placeholder="Company that made the purchase" required />
+          </div>
+          <div>
+            <label for="purchaseDate">Date Purchased</label>
+            <input id="purchaseDate" name="purchaseDate" type="date" />
+          </div>
+          <div>
+            <label for="invoice">Original Invoice Number</label>
+            <input id="invoice" name="invoice" placeholder="Example: 123456" />
+          </div>
+          <div>
+            <label for="payment">Payment Method</label>
+            <select id="payment" name="payment">
+              <option value="">Select payment method</option>
+              <option>Credit Card</option>
+              <option>Cash</option>
+              <option>Check</option>
+              <option>Charge Account</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div id="cardTools" class="card-tools full">
+            <label for="last4">Credit Card — Last 4 Digits Only</label>
+            <input id="last4" name="last4" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="1234" />
+            <div class="hint">For security, do not enter a full card number on this RMA page.</div>
+            <a id="secureCardLink" class="secure-link" href="#" target="_blank" rel="noopener">🔒 Add Card Information Securely</a>
+            <div class="hint">This button must be connected to your secure payment/card-information provider before collecting card details.</div>
+          </div>
+          <div>
+            <label for="contact">Contact Name</label>
+            <input id="contact" name="contact" autocomplete="name" placeholder="Optional" />
+          </div>
+          <div>
+            <label for="phone">Phone Number</label>
+            <input id="phone" name="phone" autocomplete="tel" placeholder="Optional" />
+          </div>
+          <div class="full">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="Optional — useful for return updates" />
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><h2>Parts Being Returned</h2><span>At least one part number is required</span></div>
+        <div id="parts"></div>
+        <button class="add-part" type="button" id="addPart">+ Add Another Part</button>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><h2>Return Details</h2><span>Optional</span></div>
+        <div class="grid">
+          <div>
+            <label for="reason">Reason for Return</label>
+            <select id="reason" name="reason">
+              <option value="">Select a reason</option>
+              <option>Wrong Part</option>
+              <option>Defective</option>
+              <option>Customer Changed Mind</option>
+              <option>Duplicate Order</option>
+              <option>Core Return</option>
+              <option>Warranty</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="po">Customer PO / Reference</label>
+            <input id="po" name="po" placeholder="Optional" />
+          </div>
+          <div class="full">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" placeholder="Add any information that may help us process the return."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="terms">Submitting this form creates a return authorization document only. Final return approval and credit are subject to Hi Tech Auto Parts 3 return policy and inspection of the merchandise. Please include the printed RMA with the returned part(s).</p>
+      </section>
+
+      <section class="section">
+        <div class="actions">
+          <button class="primary" type="submit">Create & Print RMA</button>
+          <button class="secondary" type="reset" id="clearForm">Clear Form</button>
+        </div>
+      </section>
+    </form>
+
+    <section class="track">
+      <h3>Track / Reprint an RMA</h3>
+      <p>Enter an RMA number created on this device to reopen and print it again. A shared live-status tracker can be connected to a database in the next step.</p>
+      <div class="track-line">
+        <input id="trackNumber" placeholder="Example: HT-RMA-20261006-1234" />
+        <button id="trackBtn" class="secondary" type="button">Find RMA</button>
+      </div>
+      <div id="trackResult" class="track-result"></div>
+    </section>
+  </main>
+
+  <div id="printSheet">
+    <div class="print-page">
+      <div class="print-head">
+        <div>
+          <div class="print-brand">HI TECH AUTO PARTS 3</div>
+          <div>RETURN MERCHANDISE AUTHORIZATION</div>
+        </div>
+        <div class="rma-box">RMA NUMBER<br><strong id="pRma"></strong><br><small id="pCreated"></small></div>
+      </div>
+
+      <div class="print-meta">
+        <div><strong>Company:</strong> <span id="pCompany"></span></div>
+        <div><strong>Contact:</strong> <span id="pContact"></span></div>
+        <div><strong>Date Purchased:</strong> <span id="pPurchase"></span></div>
+        <div><strong>Original Invoice:</strong> <span id="pInvoice"></span></div>
+        <div><strong>Payment:</strong> <span id="pPayment"></span></div>
+        <div><strong>Card Last 4:</strong> <span id="pLast4"></span></div>
+        <div><strong>Phone:</strong> <span id="pPhone"></span></div>
+        <div><strong>Email:</strong> <span id="pEmail"></span></div>
+        <div><strong>Reason:</strong> <span id="pReason"></span></div>
+        <div><strong>PO / Reference:</strong> <span id="pPo"></span></div>
+      </div>
+
+      <table class="print-table">
+        <thead><tr><th>Part Number</th><th>Qty</th><th>Amount Charged</th></tr></thead>
+        <tbody id="pParts"></tbody>
+      </table>
+
+      <strong>Notes</strong>
+      <div class="print-notes" id="pNotes"></div>
+      <div class="print-footer">
+        Please place this RMA with the returned merchandise. Keep a copy for your records. Return approval and final credit are subject to inspection and company return policy.
+      </div>
+    </div>
+  </div>
+
+<script>
+  const CONFIG = {
+    // Replace this with your PCI-compliant processor or secure card-information form.
+    secureCardUrl: ""
+  };
+
+  const form = document.getElementById('rmaForm');
+  const partsEl = document.getElementById('parts');
+  const message = document.getElementById('message');
+  const payment = document.getElementById('payment');
+  const cardTools = document.getElementById('cardTools');
+  const secureCardLink = document.getElementById('secureCardLink');
+
+  function addPartRow(data = {}) {
+    const row = document.createElement('div');
+    row.className = 'part-row';
+    row.innerHTML = `
+      <div class="part-number"><label>Part Number <span class="req">*</span></label><input class="partNumber" placeholder="Part number" value="${escapeAttr(data.partNumber || '')}"></div>
+      <div><label>Qty</label><input class="qty" type="number" min="1" step="1" value="${escapeAttr(data.qty || '1')}"></div>
+      <div><label>Amount Charged</label><input class="amount" type="number" min="0" step="0.01" placeholder="0.00" value="${escapeAttr(data.amount || '')}"></div>
+      <button class="remove" type="button" aria-label="Remove part">×</button>
+    `;
+    row.querySelector('.remove').addEventListener('click', () => {
+      if (partsEl.children.length > 1) row.remove();
+      else row.querySelectorAll('input').forEach((i,idx)=>i.value = idx === 1 ? '1' : '');
+    });
+    partsEl.appendChild(row);
+  }
+
+  function escapeAttr(v){ return String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function val(id){ return document.getElementById(id).value.trim(); }
+  function niceDate(v){ if(!v) return '—'; const d = new Date(v + 'T12:00:00'); return d.toLocaleDateString(); }
+  function money(v){ return v === '' ? '—' : Number(v).toLocaleString(undefined,{style:'currency',currency:'USD'}); }
+  function makeRma(){
+    const d = new Date();
+    const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+    const rand = String(Math.floor(1000 + Math.random()*9000));
+    return `HT-RMA-${y}${m}${day}-${rand}`;
+  }
+
+  function getParts(){
+    return [...partsEl.querySelectorAll('.part-row')].map(r => ({
+      partNumber:r.querySelector('.partNumber').value.trim(),
+      qty:r.querySelector('.qty').value.trim() || '1',
+      amount:r.querySelector('.amount').value.trim()
+    })).filter(p => p.partNumber || p.amount);
+  }
+
+  function collect(rma){
+    return {
+      rma, created:new Date().toISOString(),
+      company:val('company'), purchaseDate:val('purchaseDate'), invoice:val('invoice'),
+      payment:val('payment'), last4:val('last4'), contact:val('contact'), phone:val('phone'),
+      email:val('email'), reason:val('reason'), po:val('po'), notes:val('notes'), parts:getParts(),
+      status:'RMA Created'
+    };
+  }
+
+  function validate(data){
+    if(!data.company) return 'Company Name is required.';
+    if(!data.parts.some(p => p.partNumber)) return 'At least one Part Number is required.';
+    if(data.last4 && !/^\d{4}$/.test(data.last4)) return 'Card Last 4 must be exactly four digits.';
+    return '';
+  }
+
+  function save(data){
+    const records = JSON.parse(localStorage.getItem('hitechRmas') || '{}');
+    records[data.rma.toUpperCase()] = data;
+    localStorage.setItem('hitechRmas', JSON.stringify(records));
+  }
+
+  function fillPrint(data){
+    const set = (id,v) => document.getElementById(id).textContent = v || '—';
+    set('pRma',data.rma);
+    set('pCreated','Created ' + new Date(data.created).toLocaleString());
+    set('pCompany',data.company); set('pContact',data.contact); set('pPurchase',niceDate(data.purchaseDate));
+    set('pInvoice',data.invoice); set('pPayment',data.payment); set('pLast4',data.last4 ? '•••• ' + data.last4 : '—');
+    set('pPhone',data.phone); set('pEmail',data.email); set('pReason',data.reason); set('pPo',data.po); set('pNotes',data.notes);
+    const tb = document.getElementById('pParts'); tb.innerHTML = '';
+    data.parts.filter(p=>p.partNumber).forEach(p => {
+      const tr = document.createElement('tr');
+      [p.partNumber,p.qty,money(p.amount)].forEach(x=>{const td=document.createElement('td');td.textContent=x;tr.appendChild(td)});
+      tb.appendChild(tr);
+    });
+  }
+
+  payment.addEventListener('change', () => {
+    cardTools.classList.toggle('show', payment.value === 'Credit Card');
+  });
+
+  secureCardLink.addEventListener('click', (e) => {
+    if(!CONFIG.secureCardUrl){
+      e.preventDefault();
+      alert('Secure card link has not been connected yet. Hi Tech Auto Parts 3 must add its PCI-compliant card form URL before this button can accept card information.');
+      return;
+    }
+    secureCardLink.href = CONFIG.secureCardUrl;
+  });
+
+  document.getElementById('addPart').addEventListener('click', () => addPartRow());
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    message.className = 'message'; message.textContent = '';
+    const data = collect(makeRma());
+    const error = validate(data);
+    if(error){ message.className = 'message error'; message.textContent = error; window.scrollTo({top:0,behavior:'smooth'}); return; }
+    save(data); fillPrint(data);
+    message.className = 'message ok';
+    message.textContent = 'RMA ' + data.rma + ' created. Your print window is opening.';
+    window.scrollTo({top:0,behavior:'smooth'});
+    setTimeout(()=>window.print(),250);
+  });
+
+  form.addEventListener('reset', () => {
+    setTimeout(()=>{
+      partsEl.innerHTML=''; addPartRow(); cardTools.classList.remove('show');
+      message.className='message'; message.textContent='';
+    },0);
+  });
+
+  document.getElementById('trackBtn').addEventListener('click', () => {
+    const key = document.getElementById('trackNumber').value.trim().toUpperCase();
+    const out = document.getElementById('trackResult');
+    const records = JSON.parse(localStorage.getItem('hitechRmas') || '{}');
+    const data = records[key];
+    if(!data){ out.innerHTML = '<span style="color:#a52626;font-weight:700">RMA not found on this device.</span>'; return; }
+    fillPrint(data);
+    out.innerHTML = '<strong>' + escapeAttr(data.rma) + '</strong> — ' + escapeAttr(data.company) + ' — Status: <strong>' + escapeAttr(data.status || 'RMA Created') + '</strong> <button type="button" id="reprint" class="secondary" style="margin-left:8px;padding:7px 10px">Print</button>';
+    document.getElementById('reprint').addEventListener('click',()=>window.print());
+  });
+
+  addPartRow();
+</script>
+</body>
+</html>
