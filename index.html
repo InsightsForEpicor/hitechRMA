@@ -36,6 +36,8 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
 .historySearch label{margin-bottom:5px}
 .historySearch input{height:40px}
 .historySearch .btn{height:40px;white-space:nowrap}
+.histSelect{width:18px;height:18px;cursor:pointer;accent-color:#173f73}
+.histTable th:first-child,.histTable td:first-child{text-align:center;width:42px}
 @media(max-width:850px){.historySearch{grid-template-columns:1fr 1fr}.historySearch .historySearchAction{grid-column:1/-1}}.history h2{margin:0;font-size:19px}.historyActions{display:flex;gap:8px;flex-wrap:wrap}
 .tableWrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.histTable{width:100%;border-collapse:collapse;min-width:700px}.histTable th,.histTable td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:12px}.histTable th{background:#f9fafb;color:#475467}.empty{padding:18px;color:var(--muted);font-size:13px}
 
@@ -433,7 +435,7 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
   <section id="historyView" class="history historyView">
     <div class="historyHead">
       <div><h2>Return History</h2><div class="sub" style="margin:4px 0 0">Saved returns from this browser. Reprint previous RMAs or save the history to this PC.</div></div>
-      <div class="historyActions"><button id="downloadCsv" class="btn outline" type="button">Save History to PC</button></div>
+      <div class="historyActions"><button id="removeSelectedRmas" class="btn secondary" type="button">Remove Selected</button><button id="downloadCsv" class="btn outline" type="button">Save History to PC</button></div>
     </div>
     <div class="historySearch">
       <div>
@@ -789,12 +791,25 @@ function renderHistory(){
 
   let rows=h.map(d=>{
     const partList=(d.parts||[]).map(p=>p.partNumber).filter(Boolean).join(", ")||"—";
-    return '<tr><td>'+esc(d.rma)+'</td><td>'+esc(d.company)+'</td><td>'+new Date(d.created).toLocaleDateString()+'</td><td>'+esc(partList)+'</td><td>'+esc(d.po||"—")+'</td><td>'+esc(d.status||"RMA Created")+'</td><td><button class="btn outline reprint" data-rma="'+esc(d.rma)+'" style="padding:6px 9px">Print</button></td></tr>';
+    return '<tr><td><input class="histSelect" type="checkbox" data-rma="'+esc(d.rma)+'" aria-label="Select '+esc(d.rma)+'"></td><td>'+esc(d.rma)+'</td><td>'+esc(d.company)+'</td><td>'+new Date(d.created).toLocaleDateString()+'</td><td>'+esc(partList)+'</td><td>'+esc(d.po||"—")+'</td><td>'+esc(d.status||"RMA Created")+'</td><td><button class="btn outline reprint" data-rma="'+esc(d.rma)+'" style="padding:6px 9px">Print</button></td></tr>';
   }).join("");
 
-  $("historyWrap").innerHTML='<div class="tableWrap"><table class="histTable"><thead><tr><th>RMA</th><th>Company</th><th>Date</th><th>Part</th><th>PO / Reference</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  $("historyWrap").innerHTML='<div class="tableWrap"><table class="histTable"><thead><tr><th>Select</th><th>RMA</th><th>Company</th><th>Date</th><th>Part</th><th>PO / Reference</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
   document.querySelectorAll(".reprint").forEach(b=>b.onclick=()=>{const d=getHistory()[b.dataset.rma];fillPrint(d);window.print()});
 }
+$("removeSelectedRmas").onclick=()=>{
+  const selected=[...document.querySelectorAll(".histSelect:checked")].map(el=>el.dataset.rma).filter(Boolean);
+  if(!selected.length){setNotice("Select at least one RMA to remove.","error");return}
+  const msg=selected.length===1
+    ?"Remove "+selected[0]+" from this browser's Return History?"
+    :"Remove "+selected.length+" selected RMAs from this browser's Return History?";
+  if(!window.confirm(msg)) return;
+  const h=getHistory();
+  selected.forEach(rma=>delete h[rma]);
+  localStorage.setItem("hitechRmas",JSON.stringify(h));
+  renderHistory();
+  setNotice(selected.length===1?"RMA removed from Return History.":selected.length+" RMAs removed from Return History.","ok");
+};
 $("downloadCsv").onclick=()=>{const h=Object.values(getHistory());if(!h.length){setNotice("There is no return history to save yet.","error");return}const lines=[["RMA","Company","Created","Invoice","Part Numbers","Status"],...h.map(d=>[d.rma,d.company,new Date(d.created).toLocaleString(),d.invoice,(d.parts||[]).map(p=>p.partNumber).join(" | "),d.status])];const csv=lines.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\n");const blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Hi-Tech-RMA-History.csv";a.click();URL.revokeObjectURL(url)}
 ["historyRmaSearch","historyPartSearch","historyPoSearch"].forEach(id=>{
   const el=$(id); if(el) el.addEventListener("input",renderHistory);
