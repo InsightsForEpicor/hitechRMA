@@ -59,7 +59,45 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
 .biz a{font-size:12px}
 .progress{grid-template-columns:1fr 1fr}
 .grid{grid-template-columns:1fr}.partRow{grid-template-columns:1fr 70px 1fr 40px}.partRow>div:first-child{grid-column:1/-1}.step{padding:20px}.historyHead{align-items:flex-start;flex-direction:column}}
-@media print{body{background:#fff}.top,.wrap{display:none!important}#printSheet{display:block!important}@page{margin:.5in}}
+@media print{
+      @page{size:letter portrait;margin:.35in}
+      html,body{margin:0!important;padding:0!important;background:#fff!important}
+      .top,.wrap{display:none!important}
+      #printSheet{display:block!important}
+      .print-page{
+        width:100%!important;
+        height:10.3in!important;
+        min-height:10.3in!important;
+        margin:0!important;
+        padding:0!important;
+        display:flex!important;
+        flex-direction:column!important;
+        box-sizing:border-box!important;
+      }
+      .print-top{margin-bottom:.16in!important}
+      .print-brand-row{margin:.10in 0 .22in!important}
+      .print-info{margin:.12in 0 .22in!important;line-height:1.55!important}
+      .print-terms{margin:.12in 0 .20in!important;line-height:1.6!important}
+      .print-table-wrap{
+        margin-top:.05in!important;
+        min-height:3.35in!important;
+        display:flex!important;
+        flex-direction:column!important;
+      }
+      .print-summary{margin:.20in .07in .16in auto!important}
+      .print-bottom-meta{padding:.10in .08in .12in!important}
+      .print-lines{
+        margin-top:.30in!important;
+        line-height:2.7!important;
+      }
+      .print-line{margin:.06in 0!important}
+      .print-note{margin:.16in 0!important}
+      .inspection{
+        margin-top:auto!important;
+        margin-bottom:.02in!important;
+        padding:.06in 0!important;
+      }
+    }
 </style>
 </head>
 <body>
