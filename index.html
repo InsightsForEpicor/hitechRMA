@@ -78,7 +78,23 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
         <div><label>Date Purchased</label><input id="purchaseDate" type="date"></div>
         <div><label>Original Invoice Number</label><input id="invoice" placeholder="Invoice number"></div>
         <div><label>Payment Method</label><select id="payment"><option value="">Select payment method</option><option>Credit Card</option><option>Cash</option><option>Check</option><option>Charge Account</option><option>Other</option></select></div>
-        <div id="cardTools" class="cardTools full"><label>Credit Card — Last 4 Digits Only</label><input id="last4" maxlength="4" inputmode="numeric" placeholder="1234"><div class="hint">Do not enter a full card number on this page.</div></div>
+        <div id="cardTools" class="cardTools full">
+      <div class="grid">
+        <div>
+          <label>Credit Card — Last 4 Digits</label>
+          <input id="last4" maxlength="4" inputmode="numeric" placeholder="1234">
+        </div>
+        <div>
+          <label>Expiration Date</label>
+          <input id="expDate" inputmode="numeric" placeholder="MM/YY" maxlength="5">
+        </div>
+        <div class="full">
+          <label>Authorization / Payment Reference</label>
+          <input id="paymentRef" placeholder="Optional reference or approval code">
+        </div>
+      </div>
+      <div class="hint">For security, do not enter a full card number or CVV on this RMA page.</div>
+    </div>
         <div><label>Contact Name</label><input id="contact" placeholder="Optional"></div>
         <div><label>Phone Number</label><input id="phone" placeholder="Optional"></div>
         <div class="full"><label>Email</label><input id="email" type="email" placeholder="Optional"></div>
@@ -129,7 +145,7 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
   <div class="print-meta">
     <div><strong>Company:</strong> <span id="pCompany"></span></div><div><strong>Contact:</strong> <span id="pContact"></span></div>
     <div><strong>Date Purchased:</strong> <span id="pPurchase"></span></div><div><strong>Original Invoice:</strong> <span id="pInvoice"></span></div>
-    <div><strong>Payment:</strong> <span id="pPayment"></span></div><div><strong>Card Last 4:</strong> <span id="pLast4"></span></div>
+    <div><strong>Payment:</strong> <span id="pPayment"></span></div><div><strong>Card:</strong> <span id="pLast4"></span></div><div><strong>Expiration:</strong> <span id="pExpDate"></span></div><div><strong>Payment Ref:</strong> <span id="pPaymentRef"></span></div>
     <div><strong>Phone:</strong> <span id="pPhone"></span></div><div><strong>Email:</strong> <span id="pEmail"></span></div>
     <div><strong>Reason:</strong> <span id="pReason"></span></div><div><strong>PO / Reference:</strong> <span id="pPo"></span></div>
   </div>
@@ -144,7 +160,7 @@ let current=0;
 function showStep(n){current=n;steps.forEach((s,i)=>s.classList.toggle("active",i===n));psteps.forEach((p,i)=>{p.classList.toggle("active",i===n);p.classList.toggle("done",i<n)});window.scrollTo({top:0,behavior:"smooth"});if(n===3) renderReview()}
 function addPartRow(d={}){const r=document.createElement("div");r.className="partRow";r.innerHTML='<div><label>Part Number <span class="req">*</span></label><input class="partNumber" placeholder="Part number" value="'+esc(d.partNumber||"")+'"></div><div><label>Qty</label><input class="qty" type="number" min="1" value="'+esc(d.qty||"1")+'"></div><div><label>Amount Charged</label><input class="amount" type="number" min="0" step=".01" placeholder="0.00" value="'+esc(d.amount||"")+'"></div><button type="button" class="remove">×</button>';r.querySelector(".remove").onclick=()=>partsEl.children.length>1?r.remove():[...r.querySelectorAll("input")].forEach((x,i)=>x.value=i===1?"1":"");partsEl.appendChild(r)}
 function parts(){return [...partsEl.querySelectorAll(".partRow")].map(r=>({partNumber:r.querySelector(".partNumber").value.trim(),qty:r.querySelector(".qty").value.trim()||"1",amount:r.querySelector(".amount").value.trim()})).filter(x=>x.partNumber||x.amount)}
-function data(rma=""){return{rma,created:new Date().toISOString(),company:val("company"),purchaseDate:val("purchaseDate"),invoice:val("invoice"),payment:val("payment"),last4:val("last4"),contact:val("contact"),phone:val("phone"),email:val("email"),reason:val("reason"),po:val("po"),notes:val("notes"),parts:parts(),status:"RMA Created"}}
+function data(rma=""){return{rma,created:new Date().toISOString(),company:val("company"),purchaseDate:val("purchaseDate"),invoice:val("invoice"),payment:val("payment"),last4:val("last4"),expDate:val("expDate"),paymentRef:val("paymentRef"),contact:val("contact"),phone:val("phone"),email:val("email"),reason:val("reason"),po:val("po"),notes:val("notes"),parts:parts(),status:"RMA Created"}}
 function validateStep(n){if(n===0&&!val("company"))return"Company Name is required.";if(n===0&&val("last4")&&!/^\d{4}$/.test(val("last4")))return"Card Last 4 must be exactly four digits.";if(n===1&&!parts().some(p=>p.partNumber))return"At least one Part Number is required.";return""}
 function setNotice(msg,type){notice.className="notice "+type;notice.textContent=msg}
 document.querySelectorAll(".next").forEach(b=>b.onclick=()=>{const e=validateStep(current);if(e){setNotice(e,"error");return}notice.className="notice";showStep(current+1)});
@@ -156,7 +172,7 @@ function makeRma(){const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1)
 function getHistory(){return JSON.parse(localStorage.getItem("hitechRmas")||"{}")}
 function saveRma(d){const h=getHistory();h[d.rma]=d;localStorage.setItem("hitechRmas",JSON.stringify(h));renderHistory()}
 function niceDate(v){return v?new Date(v+"T12:00:00").toLocaleDateString():"—"} function money(v){return v===""?"—":Number(v).toLocaleString(undefined,{style:"currency",currency:"USD"})}
-function fillPrint(d){const s=(id,v)=>$(id).textContent=v||"—";s("pRma",d.rma);s("pCreated",new Date(d.created).toLocaleString());s("pCompany",d.company);s("pContact",d.contact);s("pPurchase",niceDate(d.purchaseDate));s("pInvoice",d.invoice);s("pPayment",d.payment);s("pLast4",d.last4?"•••• "+d.last4:"—");s("pPhone",d.phone);s("pEmail",d.email);s("pReason",d.reason);s("pPo",d.po);s("pNotes",d.notes);$("pParts").innerHTML="";d.parts.filter(p=>p.partNumber).forEach(p=>{const tr=document.createElement("tr");tr.innerHTML="<td>"+esc(p.partNumber)+"</td><td>"+esc(p.qty)+"</td><td>"+esc(money(p.amount))+"</td>";$("pParts").appendChild(tr)})}
+function fillPrint(d){const s=(id,v)=>$(id).textContent=v||"—";s("pRma",d.rma);s("pCreated",new Date(d.created).toLocaleString());s("pCompany",d.company);s("pContact",d.contact);s("pPurchase",niceDate(d.purchaseDate));s("pInvoice",d.invoice);s("pPayment",d.payment);s("pLast4",d.last4?"•••• "+d.last4:"—");s("pExpDate",d.expDate);s("pPaymentRef",d.paymentRef);s("pPhone",d.phone);s("pEmail",d.email);s("pReason",d.reason);s("pPo",d.po);s("pNotes",d.notes);$("pParts").innerHTML="";d.parts.filter(p=>p.partNumber).forEach(p=>{const tr=document.createElement("tr");tr.innerHTML="<td>"+esc(p.partNumber)+"</td><td>"+esc(p.qty)+"</td><td>"+esc(money(p.amount))+"</td>";$("pParts").appendChild(tr)})}
 form.onsubmit=e=>{e.preventDefault();const e0=validateStep(0),e1=validateStep(1);if(e0||e1){setNotice(e0||e1,"error");return}const d=data(makeRma());saveRma(d);fillPrint(d);setNotice("RMA "+d.rma+" created and saved in Return History.","ok");setTimeout(()=>window.print(),200)}
 function renderHistory(){const h=Object.values(getHistory()).sort((a,b)=>new Date(b.created)-new Date(a.created));if(!h.length){$("historyWrap").innerHTML='<div class="empty">No saved returns yet.</div>';return}let rows=h.map(d=>'<tr><td>'+esc(d.rma)+'</td><td>'+esc(d.company)+'</td><td>'+new Date(d.created).toLocaleDateString()+'</td><td>'+esc((d.parts&&d.parts[0]&&d.parts[0].partNumber)||"—")+'</td><td>'+esc(d.status||"RMA Created")+'</td><td><button class="btn outline reprint" data-rma="'+esc(d.rma)+'" style="padding:6px 9px">Print</button></td></tr>').join("");$("historyWrap").innerHTML='<div class="tableWrap"><table class="histTable"><thead><tr><th>RMA</th><th>Company</th><th>Date</th><th>Part</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';document.querySelectorAll(".reprint").forEach(b=>b.onclick=()=>{const d=getHistory()[b.dataset.rma];fillPrint(d);window.print()})}
 $("downloadCsv").onclick=()=>{const h=Object.values(getHistory());if(!h.length){setNotice("There is no return history to save yet.","error");return}const lines=[["RMA","Company","Created","Invoice","Part Numbers","Status"],...h.map(d=>[d.rma,d.company,new Date(d.created).toLocaleString(),d.invoice,(d.parts||[]).map(p=>p.partNumber).join(" | "),d.status])];const csv=lines.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\n");const blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Hi-Tech-RMA-History.csv";a.click();URL.revokeObjectURL(url)}
