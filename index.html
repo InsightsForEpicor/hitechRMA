@@ -77,7 +77,7 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
         <div><label>Company Name <span class="req">*</span></label><input id="company" autocomplete="organization" placeholder="Company name"></div>
         <div><label>Date Purchased</label><input id="purchaseDate" type="date"></div>
         <div><label>Original Invoice Number</label><input id="invoice" placeholder="Invoice number"></div>
-        <div><label>Payment Method</label><select id="payment"><option value="">Select payment method</option><option>Credit Card</option><option>Cash</option><option>Check</option><option>Charge Account</option><option>Other</option></select></div>
+        <div><label>Payment Method</label><select id="payment"><option value="">Select payment method</option><option>Credit Card</option><option>Prepaid Card</option><option>Cash</option><option>Check</option><option>Charge Account</option><option>Other</option></select></div>
         <div id="cardTools" class="cardTools full">
       <div class="grid">
         <div>
@@ -93,7 +93,7 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
           <input id="paymentRef" placeholder="Optional reference or approval code">
         </div>
       </div>
-      <div class="hint">For security, do not enter a full card number or CVV on this RMA page.</div>
+      <div class="hint">For prepaid-card returns, enter the last 4 digits, expiration date, and any refund/prepaid-card reference. Do not enter a full card number or CVV on this public RMA page.</div>
     </div>
         <div><label>Contact Name</label><input id="contact" placeholder="Optional"></div>
         <div><label>Phone Number</label><input id="phone" placeholder="Optional"></div>
@@ -145,7 +145,7 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
   <div class="print-meta">
     <div><strong>Company:</strong> <span id="pCompany"></span></div><div><strong>Contact:</strong> <span id="pContact"></span></div>
     <div><strong>Date Purchased:</strong> <span id="pPurchase"></span></div><div><strong>Original Invoice:</strong> <span id="pInvoice"></span></div>
-    <div><strong>Payment:</strong> <span id="pPayment"></span></div><div><strong>Card:</strong> <span id="pLast4"></span></div><div><strong>Expiration:</strong> <span id="pExpDate"></span></div><div><strong>Payment Ref:</strong> <span id="pPaymentRef"></span></div>
+    <div><strong>Payment:</strong> <span id="pPayment"></span></div><div><strong>Card:</strong> <span id="pLast4"></span></div><div><strong>Expiration:</strong> <span id="pExpDate"></span></div><div><strong>Refund / Prepaid Ref:</strong> <span id="pPaymentRef"></span></div>
     <div><strong>Phone:</strong> <span id="pPhone"></span></div><div><strong>Email:</strong> <span id="pEmail"></span></div>
     <div><strong>Reason:</strong> <span id="pReason"></span></div><div><strong>PO / Reference:</strong> <span id="pPo"></span></div>
   </div>
@@ -165,7 +165,7 @@ function validateStep(n){if(n===0&&!val("company"))return"Company Name is requir
 function setNotice(msg,type){notice.className="notice "+type;notice.textContent=msg}
 document.querySelectorAll(".next").forEach(b=>b.onclick=()=>{const e=validateStep(current);if(e){setNotice(e,"error");return}notice.className="notice";showStep(current+1)});
 document.querySelectorAll(".back").forEach(b=>b.onclick=()=>{notice.className="notice";showStep(current-1)});
-$("payment").onchange=()=>$("cardTools").classList.toggle("show",$("payment").value==="Credit Card");
+$("payment").onchange=()=>$("cardTools").classList.toggle("show",["Credit Card","Prepaid Card"].includes($("payment").value));
 $("addPart").onclick=()=>addPartRow();
 function renderReview(){const d=data();const plist=d.parts.filter(p=>p.partNumber).map(p=>'<p><strong>'+esc(p.partNumber)+'</strong> — Qty '+esc(p.qty)+(p.amount?' — $'+Number(p.amount).toFixed(2):'')+'</p>').join("");$("review").innerHTML='<div class="reviewBox"><h3>Purchase</h3><p><strong>'+esc(d.company)+'</strong></p><p>Invoice: '+esc(d.invoice||"—")+' | Date: '+esc(d.purchaseDate||"—")+'</p><p>Payment: '+esc(d.payment||"—")+'</p></div><div class="reviewBox"><h3>Returned Parts</h3>'+plist+'</div><div class="reviewBox"><h3>Return Details</h3><p>Reason: '+esc(d.reason||"—")+'</p><p>PO / Reference: '+esc(d.po||"—")+'</p><p>Notes: '+esc(d.notes||"—")+'</p></div>'}
 function makeRma(){const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0"),r=String(Math.floor(1000+Math.random()*9000));return 'HT-RMA-'+y+m+day+'-'+r}
