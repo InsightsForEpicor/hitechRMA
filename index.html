@@ -624,7 +624,138 @@ function fillPrint(d){
   if(customerBadge) customerBadge.textContent="CUSTOMER COPY";
   printSheet.appendChild(customerCopy);
 }
-form.onsubmit=e=>{e.preventDefault();const e0=validateStep(0),e1=validateStep(1);if(e0||e1){setNotice(e0||e1,"error");return}const d=data(makeRma());saveRma(d);fillPrint(d);setNotice("RMA "+d.rma+" created and saved in Return History.","ok");setTimeout(()=>window.print(),200)}
+const isMobileRma=()=>window.matchMedia("(max-width: 767px)").matches||/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+let mobileSubmitLocked=false;
+
+function loadExternalScript(src,id){
+  return new Promise((resolve,reject)=>{
+    if(id&&document.getElementById(id)){resolve();return}
+    const script=document.createElement("script");
+    script.src=src;
+    if(id)script.id=id;
+    script.onload=()=>resolve();
+    script.onerror=()=>reject(new Error("Unable to load PDF library"));
+    document.head.appendChild(script);
+  });
+}
+
+async function ensurePdfLibraries(){
+  if(!window.html2canvas){
+    await loadExternalScript("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js","hitech-html2canvas");
+  }
+  if(!(window.jspdf&&window.jspdf.jsPDF)){
+    await loadExternalScript("https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js","hitech-jspdf");
+  }
+}
+
+async function generateMobilePdf(d,pdfWindow){
+  await ensurePdfLibraries();
+  const printSheet=$("printSheet");
+  const oldStyle={
+    display:printSheet.style.display,
+    position:printSheet.style.position,
+    left:printSheet.style.left,
+    top:printSheet.style.top,
+    width:printSheet.style.width,
+    zIndex:printSheet.style.zIndex,
+    background:printSheet.style.background
+  };
+
+  printSheet.style.display="block";
+  printSheet.style.position="fixed";
+  printSheet.style.left="-12000px";
+  printSheet.style.top="0";
+  printSheet.style.width="8.5in";
+  printSheet.style.zIndex="-9999";
+  printSheet.style.background="#fff";
+
+  try{
+    await new Promise(r=>setTimeout(r,80));
+    const pages=[...printSheet.querySelectorAll(".print-page")];
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:"portrait",unit:"in",format:"letter",compress:true});
+
+    for(let i=0;i<pages.length;i++){
+      if(i>0)pdf.addPage("letter","portrait");
+      const canvas=await window.html2canvas(pages[i],{
+        scale:2,
+        backgroundColor:"#ffffff",
+        useCORS:true,
+        logging:false,
+        windowWidth:816
+      });
+      const img=canvas.toDataURL("image/jpeg",0.94);
+      pdf.addImage(img,"JPEG",0,0,8.5,11,undefined,"FAST");
+    }
+
+    const blob=pdf.output("blob");
+    const url=URL.createObjectURL(blob);
+    if(pdfWindow&&!pdfWindow.closed){
+      pdfWindow.location.href=url;
+    }else{
+      window.location.href=url;
+    }
+    setTimeout(()=>URL.revokeObjectURL(url),120000);
+  } finally {
+    Object.assign(printSheet.style,oldStyle);
+  }
+}
+
+form.onsubmit=async e=>{
+  e.preventDefault();
+  const e0=validateStep(0),e1=validateStep(1);
+  if(e0||e1){setNotice(e0||e1,"error");return}
+
+  const mobile=isMobileRma();
+  const submitBtn=form.querySelector('button[type="submit"]');
+
+  if(mobile&&mobileSubmitLocked){
+    setNotice("This RMA has already been submitted. The PDF was already created.","ok");
+    return;
+  }
+
+  let pdfWindow=null;
+  if(mobile){
+    mobileSubmitLocked=true;
+    if(submitBtn){
+      submitBtn.disabled=true;
+      submitBtn.textContent="RMA Submitted";
+      submitBtn.style.opacity=".65";
+      submitBtn.style.cursor="not-allowed";
+    }
+    pdfWindow=window.open("","_blank");
+    if(pdfWindow){
+      pdfWindow.document.write('<!doctype html><html><head><title>Preparing RMA PDF...</title></head><body style="font-family:Arial,sans-serif;padding:24px">Preparing your RMA PDF...</body></html>');
+      pdfWindow.document.close();
+    }
+  }
+
+  const d=data(makeRma());
+  saveRma(d);
+  fillPrint(d);
+  setNotice("RMA "+d.rma+" created and saved in Return History.","ok");
+
+  if(!mobile){
+    setTimeout(()=>window.print(),200);
+    return;
+  }
+
+  try{
+    await generateMobilePdf(d,pdfWindow);
+    setNotice("RMA "+d.rma+" created. The PDF is open and ready to share.","ok");
+  }catch(err){
+    console.error(err);
+    mobileSubmitLocked=false;
+    if(submitBtn){
+      submitBtn.disabled=false;
+      submitBtn.textContent="Create & Print RMA";
+      submitBtn.style.opacity="";
+      submitBtn.style.cursor="";
+    }
+    if(pdfWindow&&!pdfWindow.closed)pdfWindow.close();
+    setNotice("The RMA was saved, but the PDF could not be created. Please try again.","error");
+  }
+}
 function renderHistory(){
   const all=Object.values(getHistory()).sort((a,b)=>new Date(b.created)-new Date(a.created));
   const rmaQ=(($("historyRmaSearch")&&$("historyRmaSearch").value)||"").trim().toLowerCase();
