@@ -31,7 +31,12 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
 .review{display:grid;gap:12px}.reviewBox{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fcfcfd}.reviewBox h3{margin:0 0 8px;font-size:14px}.reviewBox p{margin:3px 0;font-size:13px;color:#475467}
 .notice{display:none;margin-bottom:16px;padding:12px 14px;border-radius:11px;font-size:13px;font-weight:700}.notice.error{display:block;background:#fef3f2;color:#b42318}.notice.ok{display:block;background:#ecfdf3;color:#067647}
 .history{margin-top:22px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(16,24,40,.04)}
-.historyHead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.history h2{margin:0;font-size:19px}.historyActions{display:flex;gap:8px;flex-wrap:wrap}
+.historyHead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.historySearch{display:grid;grid-template-columns:1.25fr 1fr 1fr 1fr auto;gap:10px;align-items:end;margin:0 0 14px;padding:14px;border:1px solid #b9c9df;border-radius:8px;background:#f6f9fd}
+.historySearch label{margin-bottom:5px}
+.historySearch input{height:40px}
+.historySearch .btn{height:40px;white-space:nowrap}
+@media(max-width:850px){.historySearch{grid-template-columns:1fr 1fr}.historySearch .historySearchAction{grid-column:1/-1}}.history h2{margin:0;font-size:19px}.historyActions{display:flex;gap:8px;flex-wrap:wrap}
 .tableWrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.histTable{width:100%;border-collapse:collapse;min-width:700px}.histTable th,.histTable td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:12px}.histTable th{background:#f9fafb;color:#475467}.empty{padding:18px;color:var(--muted);font-size:13px}
 
 /* Catalog-style portal redesign (screen only) */
@@ -430,6 +435,27 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
       <div><h2>Return History</h2><div class="sub" style="margin:4px 0 0">Saved returns from this browser. Reprint previous RMAs or save the history to this PC.</div></div>
       <div class="historyActions"><button id="downloadCsv" class="btn outline" type="button">Save History to PC</button></div>
     </div>
+    <div class="historySearch">
+      <div>
+        <label for="historyRmaSearch">RMA Number</label>
+        <input id="historyRmaSearch" type="text" placeholder="Search RMA">
+      </div>
+      <div>
+        <label for="historyPartSearch">Part Number</label>
+        <input id="historyPartSearch" type="text" placeholder="Search part">
+      </div>
+      <div>
+        <label for="historyPoSearch">PO / Reference</label>
+        <input id="historyPoSearch" type="text" placeholder="Search PO">
+      </div>
+      <div>
+        <label for="historyDateSearch">Date</label>
+        <input id="historyDateSearch" type="date">
+      </div>
+      <div class="historySearchAction">
+        <button id="historyResetSearch" class="btn secondary" type="button">Reset Search</button>
+      </div>
+    </div>
     <div id="historyWrap"></div>
   </section>
 </main>
@@ -599,8 +625,55 @@ function fillPrint(d){
   printSheet.appendChild(customerCopy);
 }
 form.onsubmit=e=>{e.preventDefault();const e0=validateStep(0),e1=validateStep(1);if(e0||e1){setNotice(e0||e1,"error");return}const d=data(makeRma());saveRma(d);fillPrint(d);setNotice("RMA "+d.rma+" created and saved in Return History.","ok");setTimeout(()=>window.print(),200)}
-function renderHistory(){const h=Object.values(getHistory()).sort((a,b)=>new Date(b.created)-new Date(a.created));if(!h.length){$("historyWrap").innerHTML='<div class="empty">No saved returns yet.</div>';return}let rows=h.map(d=>'<tr><td>'+esc(d.rma)+'</td><td>'+esc(d.company)+'</td><td>'+new Date(d.created).toLocaleDateString()+'</td><td>'+esc((d.parts&&d.parts[0]&&d.parts[0].partNumber)||"—")+'</td><td>'+esc(d.status||"RMA Created")+'</td><td><button class="btn outline reprint" data-rma="'+esc(d.rma)+'" style="padding:6px 9px">Print</button></td></tr>').join("");$("historyWrap").innerHTML='<div class="tableWrap"><table class="histTable"><thead><tr><th>RMA</th><th>Company</th><th>Date</th><th>Part</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';document.querySelectorAll(".reprint").forEach(b=>b.onclick=()=>{const d=getHistory()[b.dataset.rma];fillPrint(d);window.print()})}
+function renderHistory(){
+  const all=Object.values(getHistory()).sort((a,b)=>new Date(b.created)-new Date(a.created));
+  const rmaQ=(($("historyRmaSearch")&&$("historyRmaSearch").value)||"").trim().toLowerCase();
+  const partQ=(($("historyPartSearch")&&$("historyPartSearch").value)||"").trim().toLowerCase();
+  const poQ=(($("historyPoSearch")&&$("historyPoSearch").value)||"").trim().toLowerCase();
+  const dateQ=(($("historyDateSearch")&&$("historyDateSearch").value)||"").trim();
+
+  const h=all.filter(d=>{
+    const rma=String(d.rma||"").toLowerCase();
+    const parts=(d.parts||[]).map(p=>String(p.partNumber||"").toLowerCase());
+    const po=String(d.po||"").toLowerCase();
+    const created=d.created?new Date(d.created):null;
+    const createdDate=created&&!isNaN(created)?created.toISOString().slice(0,10):"";
+    const purchaseDate=String(d.purchaseDate||"").slice(0,10);
+
+    if(rmaQ && !rma.includes(rmaQ)) return false;
+    if(partQ && !parts.some(p=>p.includes(partQ))) return false;
+    if(poQ && !po.includes(poQ)) return false;
+    if(dateQ && createdDate!==dateQ && purchaseDate!==dateQ) return false;
+    return true;
+  });
+
+  if(!all.length){
+    $("historyWrap").innerHTML='<div class="empty">No saved returns yet.</div>';
+    return;
+  }
+  if(!h.length){
+    $("historyWrap").innerHTML='<div class="empty">No RMAs match your search.</div>';
+    return;
+  }
+
+  let rows=h.map(d=>{
+    const partList=(d.parts||[]).map(p=>p.partNumber).filter(Boolean).join(", ")||"—";
+    return '<tr><td>'+esc(d.rma)+'</td><td>'+esc(d.company)+'</td><td>'+new Date(d.created).toLocaleDateString()+'</td><td>'+esc(partList)+'</td><td>'+esc(d.po||"—")+'</td><td>'+esc(d.status||"RMA Created")+'</td><td><button class="btn outline reprint" data-rma="'+esc(d.rma)+'" style="padding:6px 9px">Print</button></td></tr>';
+  }).join("");
+
+  $("historyWrap").innerHTML='<div class="tableWrap"><table class="histTable"><thead><tr><th>RMA</th><th>Company</th><th>Date</th><th>Part</th><th>PO / Reference</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  document.querySelectorAll(".reprint").forEach(b=>b.onclick=()=>{const d=getHistory()[b.dataset.rma];fillPrint(d);window.print()});
+}
 $("downloadCsv").onclick=()=>{const h=Object.values(getHistory());if(!h.length){setNotice("There is no return history to save yet.","error");return}const lines=[["RMA","Company","Created","Invoice","Part Numbers","Status"],...h.map(d=>[d.rma,d.company,new Date(d.created).toLocaleString(),d.invoice,(d.parts||[]).map(p=>p.partNumber).join(" | "),d.status])];const csv=lines.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\n");const blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Hi-Tech-RMA-History.csv";a.click();URL.revokeObjectURL(url)}
+["historyRmaSearch","historyPartSearch","historyPoSearch"].forEach(id=>{
+  const el=$(id); if(el) el.addEventListener("input",renderHistory);
+});
+if($("historyDateSearch")) $("historyDateSearch").addEventListener("change",renderHistory);
+if($("historyResetSearch")) $("historyResetSearch").onclick=()=>{
+  ["historyRmaSearch","historyPartSearch","historyPoSearch","historyDateSearch"].forEach(id=>{const el=$(id);if(el)el.value=""});
+  renderHistory();
+};
+
 $("rmaTab").onclick=()=>{$("rmaView").classList.remove("hidden");$("historyView").classList.remove("active");$("rmaTab").classList.add("active");$("historyTab").classList.remove("active");window.scrollTo({top:0,behavior:"smooth"})};
 $("historyTab").onclick=()=>{$("rmaView").classList.add("hidden");$("historyView").classList.add("active");$("historyTab").classList.add("active");$("rmaTab").classList.remove("active");renderHistory();window.scrollTo({top:0,behavior:"smooth"})};
 addPartRow();renderHistory();showStep(0);
