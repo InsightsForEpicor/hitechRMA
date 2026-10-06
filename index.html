@@ -14,7 +14,7 @@ button,input,select,textarea{font:inherit}
 .biz{margin-left:auto;text-align:right;color:#344054;line-height:1.45;white-space:nowrap}
 .biz strong{display:block;color:#101828;font-size:28px;line-height:1.1;margin-bottom:8px;font-weight:800}.biz a{color:#344054;text-decoration:none;font-size:19px;font-weight:600}.biz a:hover{text-decoration:underline}
 .wrap{max-width:900px;margin:0 auto;padding:34px 20px 60px}
-.title{text-align:center;margin-bottom:22px}.title h1{margin:0 0 8px;font-size:34px;letter-spacing:-.04em}.title p{margin:0;color:var(--muted);font-size:14px}
+.title{text-align:center;margin-bottom:18px}.topTabs{display:flex;justify-content:center;gap:10px;margin:0 0 18px}.topTab{border:1px solid var(--line);background:#fff;color:#344054;border-radius:999px;padding:9px 15px;font-size:12px;font-weight:800;cursor:pointer}.topTab.active{background:#101828;color:#fff;border-color:#101828}.rmaView{display:block}.historyView{display:none}.historyView.active{display:block}.rmaView.hidden{display:none}.title h1{margin:0 0 8px;font-size:34px;letter-spacing:-.04em}.title p{margin:0;color:var(--muted);font-size:14px}
 .progress{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 18px}
 .pstep{background:#e9edf3;color:#667085;border-radius:999px;padding:8px 10px;font-size:11px;text-align:center;font-weight:800}.pstep.active{background:#101828;color:#fff}.pstep.done{background:#dbeafe;color:#1d4ed8}
 .card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(16,24,40,.05);overflow:hidden}
@@ -60,6 +60,11 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
 
 <main class="wrap">
   <div class="title"><h1>Return Merchandise Authorization</h1><p>Complete each step to create, print, and save your return.</p></div>
+  <div class="topTabs">
+    <button type="button" id="rmaTab" class="topTab active">Create RMA</button>
+    <button type="button" id="historyTab" class="topTab">Return History</button>
+  </div>
+  <div id="rmaView" class="rmaView">
   <div class="progress">
     <div class="pstep active" data-p="0">1. Purchase</div><div class="pstep" data-p="1">2. Parts</div><div class="pstep" data-p="2">3. Details</div><div class="pstep" data-p="3">4. Review</div>
   </div>
@@ -105,10 +110,12 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
     </section>
   </form>
 
-  <section class="history">
+  </div>
+
+  <section id="historyView" class="history historyView">
     <div class="historyHead">
-      <div><h2>Return History</h2><div class="sub" style="margin:4px 0 0">Saved on this browser so the customer can reprint previous RMAs.</div></div>
-      <div class="historyActions"><button id="downloadCsv" class="btn outline" type="button">Save History to PC</button><button id="clearHistory" class="btn secondary" type="button">Clear History</button></div>
+      <div><h2>Return History</h2><div class="sub" style="margin:4px 0 0">Saved returns from this browser. Reprint previous RMAs or save the history to this PC.</div></div>
+      <div class="historyActions"><button id="downloadCsv" class="btn outline" type="button">Save History to PC</button></div>
     </div>
     <div id="historyWrap"></div>
   </section>
@@ -153,7 +160,8 @@ function fillPrint(d){const s=(id,v)=>$(id).textContent=v||"—";s("pRma",d.rma)
 form.onsubmit=e=>{e.preventDefault();const e0=validateStep(0),e1=validateStep(1);if(e0||e1){setNotice(e0||e1,"error");return}const d=data(makeRma());saveRma(d);fillPrint(d);setNotice("RMA "+d.rma+" created and saved in Return History.","ok");setTimeout(()=>window.print(),200)}
 function renderHistory(){const h=Object.values(getHistory()).sort((a,b)=>new Date(b.created)-new Date(a.created));if(!h.length){$("historyWrap").innerHTML='<div class="empty">No saved returns yet.</div>';return}let rows=h.map(d=>'<tr><td>'+esc(d.rma)+'</td><td>'+esc(d.company)+'</td><td>'+new Date(d.created).toLocaleDateString()+'</td><td>'+esc((d.parts&&d.parts[0]&&d.parts[0].partNumber)||"—")+'</td><td>'+esc(d.status||"RMA Created")+'</td><td><button class="btn outline reprint" data-rma="'+esc(d.rma)+'" style="padding:6px 9px">Print</button></td></tr>').join("");$("historyWrap").innerHTML='<div class="tableWrap"><table class="histTable"><thead><tr><th>RMA</th><th>Company</th><th>Date</th><th>Part</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';document.querySelectorAll(".reprint").forEach(b=>b.onclick=()=>{const d=getHistory()[b.dataset.rma];fillPrint(d);window.print()})}
 $("downloadCsv").onclick=()=>{const h=Object.values(getHistory());if(!h.length){setNotice("There is no return history to save yet.","error");return}const lines=[["RMA","Company","Created","Invoice","Part Numbers","Status"],...h.map(d=>[d.rma,d.company,new Date(d.created).toLocaleString(),d.invoice,(d.parts||[]).map(p=>p.partNumber).join(" | "),d.status])];const csv=lines.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\n");const blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Hi-Tech-RMA-History.csv";a.click();URL.revokeObjectURL(url)}
-$("clearHistory").onclick=()=>{if(confirm("Clear all saved RMA history from this browser?")){localStorage.removeItem("hitechRmas");renderHistory()}}
+$("rmaTab").onclick=()=>{$("rmaView").classList.remove("hidden");$("historyView").classList.remove("active");$("rmaTab").classList.add("active");$("historyTab").classList.remove("active");window.scrollTo({top:0,behavior:"smooth"})};
+$("historyTab").onclick=()=>{$("rmaView").classList.add("hidden");$("historyView").classList.add("active");$("historyTab").classList.add("active");$("rmaTab").classList.remove("active");renderHistory();window.scrollTo({top:0,behavior:"smooth"})};
 addPartRow();renderHistory();showStep(0);
 </script>
 </body>
