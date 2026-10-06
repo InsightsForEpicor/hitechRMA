@@ -33,7 +33,24 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
 .history{margin-top:22px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(16,24,40,.04)}
 .historyHead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.history h2{margin:0;font-size:19px}.historyActions{display:flex;gap:8px;flex-wrap:wrap}
 .tableWrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.histTable{width:100%;border-collapse:collapse;min-width:700px}.histTable th,.histTable td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:12px}.histTable th{background:#f9fafb;color:#475467}.empty{padding:18px;color:var(--muted);font-size:13px}
-#printSheet{display:none}.print-page{padding:28px;background:#fff;color:#111;font-family:Arial,sans-serif}.print-head{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #111;padding-bottom:12px}.print-logo{width:170px;height:auto}.print-contact{text-align:right;font-size:10px;line-height:1.45}.rma{margin-top:6px;font-size:11px}.rma strong{font-size:17px}.print-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin:18px 0;font-size:12px}.print-table{width:100%;border-collapse:collapse;margin:14px 0}.print-table th,.print-table td{border:1px solid #999;padding:7px;font-size:11px;text-align:left}.print-notes{border:1px solid #aaa;min-height:60px;padding:8px;font-size:11px;white-space:pre-wrap}
+#printSheet{display:none}
+.print-page{width:8.5in;min-height:11in;margin:0 auto;padding:.22in .30in;background:#fff;color:#111;font-family:"Times New Roman",Times,serif;font-size:11px}
+.print-top{display:grid;grid-template-columns:1fr 2fr 1fr;align-items:start;margin-bottom:8px}
+.print-date{font-size:11px}.print-title{text-align:center;font-weight:700;font-size:12px;letter-spacing:.01em}.print-rma-top{text-align:right;font-weight:700;font-size:12px}
+.print-brand-row{display:grid;grid-template-columns:1.05fr 1fr 1.25fr;gap:18px;align-items:start;margin:6px 0 12px}
+.print-logo{width:175px;height:auto;display:block}
+.print-barcode-box{text-align:center}.fake-barcode{width:138px;height:44px;margin:0 auto 3px;background:repeating-linear-gradient(90deg,#000 0,#000 2px,#fff 2px,#fff 4px,#000 4px,#000 5px,#fff 5px,#fff 8px)}
+.print-rma-big{font-size:17px;font-weight:700;letter-spacing:.06em}
+.print-company{font-size:11px;line-height:1.3}.print-company strong{font-size:12px}
+.print-info{display:grid;grid-template-columns:1fr 1.35fr;gap:44px;margin:6px 0 10px;line-height:1.35}.print-info-title{font-weight:700;text-decoration:underline;margin-bottom:2px}
+.print-terms{margin:6px 0 8px;line-height:1.4}
+.print-table-wrap{border:1px solid #000;margin-top:7px;min-height:190px}
+.print-table{width:100%;border-collapse:collapse;margin:0}.print-table th,.print-table td{padding:5px 4px;vertical-align:top;font-size:10px}.print-table thead th{border-bottom:1px solid #000;font-weight:700;text-align:left}.print-table .num{text-align:right;white-space:nowrap}
+.print-returned-as{font-size:10px;margin-top:4px;color:#222}
+.print-summary{width:255px;margin:8px 7px 8px auto;font-size:10px}.print-summary-row{display:flex;justify-content:space-between;gap:15px;margin:3px 0}.print-summary-row.total{font-weight:700}
+.print-bottom-meta{display:flex;justify-content:space-between;align-items:flex-end;padding:4px 8px 6px;font-size:10px}
+.print-lines{margin-top:12px;font-size:10px;line-height:1.8}.print-line{display:flex;align-items:flex-end;gap:5px;margin:2px 0}.linefill{border-bottom:1px solid #000;height:14px;flex:1}.shortfill{border-bottom:1px solid #000;height:14px;width:70px}
+.print-note{margin:7px 0}.inspection{margin-top:12px;border-top:2px dashed #000;border-bottom:2px dashed #000;text-align:center;font-weight:700;padding:3px 0;font-size:10px}
 @media(max-width:720px){
 .topin{height:auto;min-height:92px;padding:10px 14px;gap:14px}
 .brandLogo{width:245px;max-width:52%;height:auto;max-height:74px;object-fit:contain}
@@ -137,21 +154,92 @@ input:focus,select:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3p
   </section>
 </main>
 
-<div id="printSheet"><div class="print-page">
-  <div class="print-head">
-    <div><img class="print-logo" src="data:image/png;base64,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" alt=""><div style="font-size:11px;margin-top:5px">RETURN MERCHANDISE AUTHORIZATION</div></div>
-    <div class="print-contact"><strong>Hi Tech Auto Parts 3</strong><br>(305) 239-6666<br>534 E 9th St, Hialeah, FL 33010<br>hitechautoparts3.com<div class="rma">RMA NUMBER<br><strong id="pRma"></strong><br><span id="pCreated"></span></div></div>
+<div id="printSheet">
+  <div class="print-page">
+    <div class="print-top">
+      <div id="pPrintDate" class="print-date"></div>
+      <div class="print-title">RETURN MERCHANDISE AUTHORIZATION</div>
+      <div class="print-rma-top">RMA# <span id="pRmaTop"></span></div>
+    </div>
+
+    <div class="print-brand-row">
+      <div><img class="print-logo" src="data:image/png;base64,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" alt="Hi Tech Auto Parts"></div>
+      <div class="print-barcode-box">
+        <div class="fake-barcode"></div>
+        <div id="pRmaBarcode" class="print-rma-big"></div>
+      </div>
+      <div class="print-company">
+        <strong>HI TECH AUTO PARTS 3</strong><br>
+        534 E 9TH ST<br>
+        HIALEAH, FL 33010<br>
+        (305) 239-6666<br>
+        hitechautoparts3.com
+      </div>
+    </div>
+
+    <div class="print-info">
+      <div>
+        <div class="print-info-title">Returns Branch</div>
+        HI TECH AUTO PARTS 3<br>
+        534 E 9TH ST<br>
+        HIALEAH, FL 33010
+      </div>
+      <div>
+        <div><strong>Customer / Company:</strong> <span id="pCompany"></span></div>
+        <div><strong>Contact:</strong> <span id="pContact"></span></div>
+        <div><strong>Phone:</strong> <span id="pPhone"></span></div>
+        <div><strong>Email:</strong> <span id="pEmail"></span></div>
+      </div>
+    </div>
+
+    <div class="print-terms">
+      <strong>Terms:</strong> <span id="pPayment"></span><br>
+      <strong>Customer PO #:</strong> <span id="pPo"></span><br>
+      <strong>Original Invoice #:</strong> <span id="pInvoice"></span> &nbsp;&nbsp;
+      <strong>Purchase Date:</strong> <span id="pPurchase"></span>
+    </div>
+
+    <div class="print-table-wrap">
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th style="width:6%">QTY</th>
+            <th style="width:14%">PART #</th>
+            <th style="width:19%">RETURN REASON</th>
+            <th style="width:23%">DESCRIPTION / NOTES</th>
+            <th style="width:12%">MFR / INV #</th>
+            <th style="width:10%" class="num">UNIT PRICE</th>
+            <th style="width:8%" class="num">CORE</th>
+            <th style="width:12%" class="num">EXTENDED</th>
+          </tr>
+        </thead>
+        <tbody id="pPartsRows"></tbody>
+      </table>
+
+      <div class="print-summary">
+        <div class="print-summary-row"><span>Subtotal:</span><span id="pSubtotal"></span></div>
+        <div class="print-summary-row"><span>Restocking Fees:</span><span>$0.00</span></div>
+        <div class="print-summary-row total"><span>Total Credit:</span><span id="pTotalCredit"></span></div>
+      </div>
+
+      <div class="print-bottom-meta">
+        <div>Total Items: <span id="pItemCount"></span></div>
+        <div id="pCardSafe"></div>
+      </div>
+    </div>
+
+    <div class="print-lines">
+      <div class="print-line"><span>Deducted YES / NO from INVOICE NO.</span><span class="linefill"></span></div>
+      <div class="print-line"><span>Customer Signature</span><span class="linefill"></span><span>Date</span><span class="shortfill"></span></div>
+      <div class="print-note">Please include a copy of this RA with your return to insure proper credit.</div>
+      <div class="print-line"><span>RA Taken By</span><span class="linefill"></span></div>
+      <div class="print-line"><span>Driver # & Signature</span><span class="linefill"></span><span>Date</span><span class="shortfill"></span></div>
+      <div class="print-line"><span>Checked in by</span><span class="linefill"></span><span>Date</span><span class="shortfill"></span></div>
+    </div>
+
+    <div class="inspection">ALL ITEMS RETURNED ARE SUBJECT TO INSPECTION PRIOR TO CREDIT BEING ISSUED</div>
   </div>
-  <div class="print-meta">
-    <div><strong>Company:</strong> <span id="pCompany"></span></div><div><strong>Contact:</strong> <span id="pContact"></span></div>
-    <div><strong>Date Purchased:</strong> <span id="pPurchase"></span></div><div><strong>Original Invoice:</strong> <span id="pInvoice"></span></div>
-    <div><strong>Payment:</strong> <span id="pPayment"></span></div><div><strong>Card:</strong> <span id="pLast4"></span></div><div><strong>Expiration:</strong> <span id="pExpDate"></span></div><div><strong>Refund / Prepaid Ref:</strong> <span id="pPaymentRef"></span></div>
-    <div><strong>Phone:</strong> <span id="pPhone"></span></div><div><strong>Email:</strong> <span id="pEmail"></span></div>
-    <div><strong>Reason:</strong> <span id="pReason"></span></div><div><strong>PO / Reference:</strong> <span id="pPo"></span></div>
-  </div>
-  <table class="print-table"><thead><tr><th>Part Number</th><th>Qty</th><th>Amount Charged</th></tr></thead><tbody id="pParts"></tbody></table>
-  <strong>Notes</strong><div id="pNotes" class="print-notes"></div>
-</div></div>
+</div>
 
 <script>
 const $=id=>document.getElementById(id), val=id=>$(id).value.trim(), esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -172,7 +260,48 @@ function makeRma(){const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1)
 function getHistory(){return JSON.parse(localStorage.getItem("hitechRmas")||"{}")}
 function saveRma(d){const h=getHistory();h[d.rma]=d;localStorage.setItem("hitechRmas",JSON.stringify(h));renderHistory()}
 function niceDate(v){return v?new Date(v+"T12:00:00").toLocaleDateString():"—"} function money(v){return v===""?"—":Number(v).toLocaleString(undefined,{style:"currency",currency:"USD"})}
-function fillPrint(d){const s=(id,v)=>$(id).textContent=v||"—";s("pRma",d.rma);s("pCreated",new Date(d.created).toLocaleString());s("pCompany",d.company);s("pContact",d.contact);s("pPurchase",niceDate(d.purchaseDate));s("pInvoice",d.invoice);s("pPayment",d.payment);s("pLast4",d.last4?"•••• "+d.last4:"—");s("pExpDate",d.expDate);s("pPaymentRef",d.paymentRef);s("pPhone",d.phone);s("pEmail",d.email);s("pReason",d.reason);s("pPo",d.po);s("pNotes",d.notes);$("pParts").innerHTML="";d.parts.filter(p=>p.partNumber).forEach(p=>{const tr=document.createElement("tr");tr.innerHTML="<td>"+esc(p.partNumber)+"</td><td>"+esc(p.qty)+"</td><td>"+esc(money(p.amount))+"</td>";$("pParts").appendChild(tr)})}
+function fillPrint(d){
+  const set=(id,v)=>{const el=$(id);if(el)el.textContent=(v===undefined||v===null||v==="")?"—":v};
+  const created=new Date(d.created);
+  set("pPrintDate",created.toLocaleDateString());
+  set("pRmaTop",d.rma);
+  set("pRmaBarcode",String(d.rma||"").replace(/^HT-RMA-/,""));
+  set("pCompany",d.company);
+  set("pContact",d.contact);
+  set("pPhone",d.phone);
+  set("pEmail",d.email);
+  set("pPayment",d.payment||"—");
+  set("pPo",d.po);
+  set("pInvoice",d.invoice);
+  set("pPurchase",niceDate(d.purchaseDate));
+
+  const rows=$("pPartsRows");
+  rows.innerHTML="";
+  let subtotal=0,itemCount=0;
+  (d.parts||[]).filter(p=>p.partNumber).forEach(p=>{
+    const qty=Math.max(1,Number(p.qty||1));
+    const unit=Number(p.amount||0);
+    const extended=qty*unit;
+    subtotal+=extended;
+    itemCount+=qty;
+    const tr=document.createElement("tr");
+    tr.innerHTML=
+      "<td>"+esc(qty)+"</td>"+
+      "<td>"+esc(p.partNumber)+"</td>"+
+      "<td>"+esc(d.reason||"Return Merchandise / Customer")+"</td>"+
+      "<td>"+esc(d.notes||"")+'<div class="print-returned-as">Returned as: '+esc(p.partNumber)+"</div></td>"+
+      "<td>"+esc(d.invoice||"")+"</td>"+
+      '<td class="num">'+esc(money(String(unit)))+"</td>"+
+      '<td class="num">$0.00</td>'+
+      '<td class="num">'+esc(money(String(extended)))+"</td>";
+    rows.appendChild(tr);
+  });
+  set("pSubtotal",money(String(subtotal)));
+  set("pTotalCredit",money(String(subtotal)));
+  set("pItemCount",String(itemCount));
+  const card=(d.last4?("Card •••• "+d.last4+(d.expDate?"  Exp "+d.expDate:"")):"");
+  set("pCardSafe",card);
+}
 form.onsubmit=e=>{e.preventDefault();const e0=validateStep(0),e1=validateStep(1);if(e0||e1){setNotice(e0||e1,"error");return}const d=data(makeRma());saveRma(d);fillPrint(d);setNotice("RMA "+d.rma+" created and saved in Return History.","ok");setTimeout(()=>window.print(),200)}
 function renderHistory(){const h=Object.values(getHistory()).sort((a,b)=>new Date(b.created)-new Date(a.created));if(!h.length){$("historyWrap").innerHTML='<div class="empty">No saved returns yet.</div>';return}let rows=h.map(d=>'<tr><td>'+esc(d.rma)+'</td><td>'+esc(d.company)+'</td><td>'+new Date(d.created).toLocaleDateString()+'</td><td>'+esc((d.parts&&d.parts[0]&&d.parts[0].partNumber)||"—")+'</td><td>'+esc(d.status||"RMA Created")+'</td><td><button class="btn outline reprint" data-rma="'+esc(d.rma)+'" style="padding:6px 9px">Print</button></td></tr>').join("");$("historyWrap").innerHTML='<div class="tableWrap"><table class="histTable"><thead><tr><th>RMA</th><th>Company</th><th>Date</th><th>Part</th><th>Status</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';document.querySelectorAll(".reprint").forEach(b=>b.onclick=()=>{const d=getHistory()[b.dataset.rma];fillPrint(d);window.print()})}
 $("downloadCsv").onclick=()=>{const h=Object.values(getHistory());if(!h.length){setNotice("There is no return history to save yet.","error");return}const lines=[["RMA","Company","Created","Invoice","Part Numbers","Status"],...h.map(d=>[d.rma,d.company,new Date(d.created).toLocaleString(),d.invoice,(d.parts||[]).map(p=>p.partNumber).join(" | "),d.status])];const csv=lines.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\n");const blob=new Blob([csv],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Hi-Tech-RMA-History.csv";a.click();URL.revokeObjectURL(url)}
